@@ -8,8 +8,9 @@ import ThemeToggle from '../components/ThemeToggle.jsx'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('login')
-  const [email, setEmail] = useState('demo@notepad.max')
-  const [password, setPassword] = useState('notepadmax')
+  const [email, setEmail] = useState(canUseLocalDemo ? 'demo@notepad.max' : '')
+  const [password, setPassword] = useState(canUseLocalDemo ? 'notepadmax' : '')
+  const [notice, setNotice] = useState('')
   const { session, loading, error, login, register } = useAuthStore()
   const navigate = useNavigate()
 
@@ -17,9 +18,18 @@ export default function AuthPage() {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    setNotice('')
     const action = mode === 'login' ? login : register
-    await action({ email, password })
-    navigate('/')
+    const nextSession = await action({ email, password })
+
+    if (nextSession) {
+      navigate('/')
+      return
+    }
+
+    if (mode === 'register') {
+      setNotice('Account created. Check your email to confirm it, then come back and log in.')
+    }
   }
 
   return (
@@ -67,7 +77,10 @@ export default function AuthPage() {
                 className={`h-11 flex-1 rounded-[18px] text-sm font-bold transition ${mode === item ? 'bg-white/18 text-white light:bg-white light:text-slate-950' : 'text-white/50 light:text-slate-500'}`}
                 key={item}
                 type="button"
-                onClick={() => setMode(item)}
+                onClick={() => {
+                  setMode(item)
+                  setNotice('')
+                }}
               >
                 {item === 'login' ? 'Login' : 'Register'}
               </button>
@@ -91,13 +104,20 @@ export default function AuthPage() {
           </label>
 
           {error && <p className="mb-4 rounded-2xl bg-coral/12 px-4 py-3 text-sm text-coral">{error}</p>}
+          {notice && <p className="mb-4 rounded-2xl bg-mint/12 px-4 py-3 text-sm text-mint">{notice}</p>}
 
           <button className="primary-button h-13 w-full" disabled={loading} type="submit">
             {loading ? 'Please wait...' : mode === 'login' ? 'Login' : 'Create account'}
           </button>
 
           <p className="mt-5 text-center text-sm text-white/42 light:text-slate-500">
-            {isSupabaseConfigured ? 'Session persists with Supabase Auth.' : canUseLocalDemo ? 'Dev demo accepts any email and password.' : 'Add Supabase env vars in Vercel to enable auth.'}
+            {isSupabaseConfigured
+              ? mode === 'login'
+                ? 'Use an existing Supabase account, or switch to Register first.'
+                : 'Supabase may ask you to confirm your email before login.'
+              : canUseLocalDemo
+                ? 'Dev demo accepts any email and password.'
+                : 'Add Supabase env vars in Vercel to enable auth.'}
           </p>
         </form>
       </motion.section>
