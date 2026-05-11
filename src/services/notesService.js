@@ -1,5 +1,5 @@
 import { uid } from '../lib/format.js'
-import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
+import { canUseLocalDemo, isSupabaseConfigured, missingSupabaseMessage, supabase } from '../lib/supabase.js'
 import { localDatabase } from './localDatabase.js'
 
 function currentUserId(session) {
@@ -9,12 +9,13 @@ function currentUserId(session) {
 export async function fetchWorkspace(session) {
   const userId = currentUserId(session)
 
-  if (!isSupabaseConfigured) {
+  if (canUseLocalDemo) {
     return {
       groups: localDatabase.listGroups(userId),
       notes: localDatabase.listNotes(userId),
     }
   }
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const [groupsResult, notesResult] = await Promise.all([
     supabase.from('groups').select('*').order('created_at', { ascending: true }),
@@ -38,7 +39,8 @@ export async function createGroup(session, name) {
     created_at: new Date().toISOString(),
   }
 
-  if (!isSupabaseConfigured) return localDatabase.upsertGroup(group)
+  if (canUseLocalDemo) return localDatabase.upsertGroup(group)
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { data, error } = await supabase.from('groups').insert(group).select().single()
   if (error) throw error
@@ -46,7 +48,8 @@ export async function createGroup(session, name) {
 }
 
 export async function renameGroup(groupId, name) {
-  if (!isSupabaseConfigured) return localDatabase.upsertGroup({ id: groupId, name })
+  if (canUseLocalDemo) return localDatabase.upsertGroup({ id: groupId, name })
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { data, error } = await supabase.from('groups').update({ name }).eq('id', groupId).select().single()
   if (error) throw error
@@ -54,7 +57,8 @@ export async function renameGroup(groupId, name) {
 }
 
 export async function removeGroup(groupId) {
-  if (!isSupabaseConfigured) return localDatabase.deleteGroup(groupId)
+  if (canUseLocalDemo) return localDatabase.deleteGroup(groupId)
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { error } = await supabase.from('groups').delete().eq('id', groupId)
   if (error) throw error
@@ -73,7 +77,8 @@ export async function createNote(session, groupId) {
     updated_at: now,
   }
 
-  if (!isSupabaseConfigured) return localDatabase.upsertNote(note)
+  if (canUseLocalDemo) return localDatabase.upsertNote(note)
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { data, error } = await supabase.from('notes').insert(note).select().single()
   if (error) throw error
@@ -83,7 +88,8 @@ export async function createNote(session, groupId) {
 export async function updateNote(noteId, changes) {
   const payload = { ...changes, updated_at: new Date().toISOString() }
 
-  if (!isSupabaseConfigured) return localDatabase.upsertNote({ id: noteId, ...payload })
+  if (canUseLocalDemo) return localDatabase.upsertNote({ id: noteId, ...payload })
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { data, error } = await supabase.from('notes').update(payload).eq('id', noteId).select().single()
   if (error) throw error
@@ -91,7 +97,8 @@ export async function updateNote(noteId, changes) {
 }
 
 export async function removeNote(noteId) {
-  if (!isSupabaseConfigured) return localDatabase.deleteNote(noteId)
+  if (canUseLocalDemo) return localDatabase.deleteNote(noteId)
+  if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { error } = await supabase.from('notes').delete().eq('id', noteId)
   if (error) throw error

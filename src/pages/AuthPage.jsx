@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { LockKeyhole, Mail, NotebookPen, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { isSupabaseConfigured } from '../lib/supabase.js'
+import { canUseLocalDemo, isSupabaseConfigured } from '../lib/supabase.js'
 import { useAuthStore } from '../store/useAuthStore.js'
 import ThemeToggle from '../components/ThemeToggle.jsx'
 
@@ -49,13 +49,13 @@ export default function AuthPage() {
             </div>
             <h2 className="text-5xl font-black leading-[1.03] tracking-tight md:text-6xl">Write quickly. Organize calmly.</h2>
             <p className="mt-5 text-base leading-7 text-white/56 light:text-slate-600">
-              A premium notepad workspace with pinned notes, groups, search, autosave, and Supabase sync.
+              A premium notepad workspace with pinned notes, groups, search, autosave, and Supabase storage.
             </p>
           </div>
 
-          {!isSupabaseConfigured && (
+          {canUseLocalDemo && (
             <div className="absolute bottom-6 left-6 right-6 rounded-[24px] border border-mint/20 bg-mint/10 p-4 text-sm text-mint">
-              Local demo mode is active. Add Supabase env keys to enable cloud auth and storage.
+              Development demo mode is active. Production on Vercel requires Supabase env keys.
             </div>
           )}
         </div>
@@ -97,7 +97,7 @@ export default function AuthPage() {
           </button>
 
           <p className="mt-5 text-center text-sm text-white/42 light:text-slate-500">
-            {isSupabaseConfigured ? 'Session persists with Supabase Auth.' : 'Demo accepts any email and password.'}
+            {isSupabaseConfigured ? 'Session persists with Supabase Auth.' : canUseLocalDemo ? 'Dev demo accepts any email and password.' : 'Add Supabase env vars in Vercel to enable auth.'}
           </p>
         </form>
       </motion.section>

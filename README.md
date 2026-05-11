@@ -5,7 +5,8 @@ A modern glassmorphic note-taking app built with React, Vite, Tailwind CSS, Zust
 ## Features
 
 - Email/password auth with Supabase Auth
-- Local demo mode when Supabase env vars are not configured
+- Supabase Auth and PostgreSQL storage for hosted production
+- Development-only local demo mode when Supabase env vars are not configured
 - Notes CRUD with optimistic updates
 - Groups/folders with create, rename, delete, and filtering
 - Instant search across title and rich content
@@ -28,14 +29,14 @@ Open `http://127.0.0.1:5173`.
 
 1. Create a Supabase project.
 2. Run `supabase.schema.sql` in the Supabase SQL editor.
-3. Add these env vars locally and in Vercel:
+3. Add these env vars in Vercel Project Settings -> Environment Variables:
 
 ```bash
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 ```
 
-Without env vars, the app runs in local demo mode using browser storage.
+For local development, you can also add them to a local `.env` file. Without env vars, only `npm run dev` uses browser storage as a temporary development demo. Production builds on Vercel require Supabase env vars.
 
 ## Deployment
 
@@ -43,3 +44,4 @@ Use Vercel with the default Vite settings:
 
 - Build command: `npm run build`
 - Output directory: `dist`
+- Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
