@@ -34,7 +34,10 @@ Open `http://127.0.0.1:5173`.
 ```bash
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_ADMIN_EMAIL=
 ```
+
+`VITE_ADMIN_EMAIL` is optional. If set, typing `admin` in the email field will sign in against that Supabase email address with the password you enter.
 
 For local development, you can also add them to a local `.env` file. Without env vars, only `npm run dev` uses browser storage as a temporary development demo. Production builds on Vercel require Supabase env vars.
 
@@ -44,4 +47,4 @@ Use Vercel with the default Vite settings:
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, optional `VITE_ADMIN_EMAIL`

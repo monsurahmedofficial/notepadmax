@@ -8,8 +8,8 @@ import ThemeToggle from '../components/ThemeToggle.jsx'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('login')
-  const [email, setEmail] = useState(canUseLocalDemo ? 'demo@notepad.max' : '')
-  const [password, setPassword] = useState(canUseLocalDemo ? 'notepadmax' : '')
+  const [email, setEmail] = useState(canUseLocalDemo ? 'demo@notepad.max' : 'admin')
+  const [password, setPassword] = useState(canUseLocalDemo ? 'notepadmax' : 'admin')
   const [notice, setNotice] = useState('')
   const { session, loading, error, login, register } = useAuthStore()
   const navigate = useNavigate()
@@ -88,10 +88,10 @@ export default function AuthPage() {
           </div>
 
           <label className="mb-4 block">
-            <span className="mb-2 block text-sm font-semibold text-white/58 light:text-slate-600">Email</span>
+            <span className="mb-2 block text-sm font-semibold text-white/58 light:text-slate-600">Email or username</span>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/38" size={18} />
-              <input className="field h-13 pl-12 pr-4" required type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+              <input className="field h-13 pl-12 pr-4" required type="text" value={email} onChange={(event) => setEmail(event.target.value)} />
             </div>
           </label>
 
@@ -99,7 +99,7 @@ export default function AuthPage() {
             <span className="mb-2 block text-sm font-semibold text-white/58 light:text-slate-600">Password</span>
             <div className="relative">
               <LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-white/38" size={18} />
-              <input className="field h-13 pl-12 pr-4" minLength={6} required type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+              <input className="field h-13 pl-12 pr-4" required type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
             </div>
           </label>
 
@@ -113,7 +113,7 @@ export default function AuthPage() {
           <p className="mt-5 text-center text-sm text-white/42 light:text-slate-500">
             {isSupabaseConfigured
               ? mode === 'login'
-                ? 'Use an existing Supabase account, or switch to Register first.'
+                ? 'Use admin as an alias only after VITE_ADMIN_EMAIL is configured, or log in with your Supabase email.'
                 : 'Supabase may ask you to confirm your email before login.'
               : canUseLocalDemo
                 ? 'Dev demo accepts any email and password.'

@@ -1,8 +1,20 @@
 import { canUseLocalDemo, isSupabaseConfigured, missingSupabaseMessage, supabase } from '../lib/supabase.js'
 import { localDatabase } from './localDatabase.js'
 
+function normalizeEmail(email) {
+  const value = email.trim()
+  if (value.toLowerCase() !== 'admin') return value
+
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL
+  if (!adminEmail) {
+    throw new Error('Admin alias is not configured. Add VITE_ADMIN_EMAIL in Vercel or use your full Supabase email.')
+  }
+  return adminEmail
+}
+
 export async function getInitialSession() {
-  if (canUseLocalDemo) return localDatabase.getSession()
+  const localSession = localDatabase.getSession()
+  if (canUseLocalDemo) return localSession
   if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
   const { data, error } = await supabase.auth.getSession()
@@ -25,7 +37,7 @@ export async function signInWithPassword({ email, password }) {
   }
   if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await supabase.auth.signInWithPassword({ email: normalizeEmail(email), password })
   if (error) throw error
   return data.session
 }
@@ -38,7 +50,7 @@ export async function signUpWithPassword({ email, password }) {
   }
   if (!isSupabaseConfigured) throw new Error(missingSupabaseMessage)
 
-  const { data, error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await supabase.auth.signUp({ email: normalizeEmail(email), password })
   if (error) throw error
   return data.session
 }
